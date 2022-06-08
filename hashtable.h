@@ -6,8 +6,11 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-#define HASHTABLE_MAX_LOAD_FACTOR 0.75
+#define HT_MAX_LOAD_FACTOR 0.75
+#define HT_MAX_KEY_LEN 127
+#define HT_MAX_VAL_LEN HT_MAX_KEY_LEN
 
 typedef struct {
   char *key;
