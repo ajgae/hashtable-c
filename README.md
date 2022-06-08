@@ -5,5 +5,5 @@ This is a simple implementation of a string-to-string hashtable (both keys and v
 ## Compilation
 
 ```console
-gcc -o a.out hashtable.c
+$ gcc -o a.out hashtable.c
 ```
