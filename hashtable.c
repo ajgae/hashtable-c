@@ -7,7 +7,9 @@ void hashtable_init(HashTable *ht) {
 }
 
 void hashtable_free(HashTable *ht) {
-  // TODO
+  if (ht == NULL) return;
+  if (ht->entries != NULL)
+    free(ht->entries);
 }
 
 bool hashtable_put(HashTable *ht, char *key, char *value) {
@@ -66,13 +68,4 @@ uint32_t strhash(char *s) {
     hash *= 16777619;
   }
   return hash;
-}
-
-int main(int argc, char **argv) {
-  HashTable ht;
-  hashtable_init(&ht);
-  hashtable_adjust_capacity(&ht, 4);
-  hashtable_put(&ht, "an apple a day", "keeps the doctor away");
-  hashtable_put(&ht, "hello", "world");
-  return 0;
 }
