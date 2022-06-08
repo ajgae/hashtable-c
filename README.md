@@ -4,7 +4,7 @@ This is a simple implementation of a string-to-string hashtable (both keys and v
 
 ## Compilation
 
-`gcc -o a.out hashtable.c`
+`gcc -o a.out hashtable.c main.c`
 
 ## Usage
 
