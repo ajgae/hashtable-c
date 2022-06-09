@@ -58,7 +58,20 @@ int main(int argc, char **argv) {
         fprintf(stderr, "Error: string argument required for hash command\n");
       } else {
         uint32_t hash = strhash(str);
-        printf("Hash value: 0x%x\n", hash);
+        char *mod_str = strtok(NULL, INPUT_DELIMITERS);
+        if (mod_str == NULL) {
+          printf("Hash value: 0x%x\n", hash);
+        } else {
+          char *endptr;
+          int mod = strtol(mod_str, &endptr, 10);
+          if (*endptr != '\0' || mod <= 0) {
+            fprintf(stderr, "Error: the second argument to the hash command "
+                            "must be a valid positive non-zero integer.\n");
+          } else {
+            uint32_t hash_mod = hash % mod;
+            printf("Hash value mod %d: %d\n", mod, hash_mod);
+          }
+        }
       }
     }
 
