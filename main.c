@@ -1,6 +1,18 @@
 #include "main.h"
 #include "hashtable.h"
-#include <string.h>
+
+#ifdef _USE_READLINE
+const int num_commands = 7;
+const char *commands[] = {
+  "exit",
+  "hash",
+  "put",
+  "q",
+  "quit",
+  "remove",
+  "show",
+};
+#endif
 
 int main(int argc, char **argv) {
   printf("Hello! Welcome to the hashtable prompt program.\n");
@@ -8,18 +20,34 @@ int main(int argc, char **argv) {
   hashtable_init(&ht);
   hashtable_adjust_capacity(&ht, 4);
   
+#ifdef _USE_READLINE
+  // initialize readline
+  rl_attempted_completion_function = completion_function;
+#else
   char *user_input = malloc(MAX_INPUT_LENGTH);
+#endif
 
   for (;;) {
-    printf("> ");
+#ifdef _USE_READLINE
+    char *user_input = readline("> ");
+#else // alternate prompt, ugly when input > MAX_INPUT_LENGTH but
+      // shouldn't cause actual issues
+    fputs("> ", stdout);
 
     fgets(user_input, MAX_INPUT_LENGTH, stdin);
     int len = strlen(user_input);
     if (len > 0 && user_input[len - 1] == '\n') {
       user_input[len - 1] = '\0';
     }
+#endif
 
+    if (user_input == NULL) {
+      continue;
+    }
     char *token = strtok(user_input, INPUT_DELIMITERS);
+    if (token == NULL) {
+      continue;
+    }
 
     if (!strncmp("exit", token, MAX_INPUT_LENGTH) ||
         !strncmp("quit", token, MAX_INPUT_LENGTH) ||
@@ -98,7 +126,40 @@ int main(int argc, char **argv) {
 
   // free and exit
   hashtable_free(&ht);
+#ifndef _USE_READLINE
   free(user_input);
+#endif
   return 0;
 }
 
+#ifdef _USE_READLINE
+char **completion_function(const char *text, int start, int end) {
+  char **matches = NULL;
+  if (start == 0) {
+    matches = rl_completion_matches(text, command_generator);
+  }
+  return matches;
+}
+
+char *command_generator(const char *text, int state) {
+  static int i;
+  static int len; // cached for efficiency
+
+  if (state == 0) {
+    // initialize command generator
+    i = 0;
+    len = strlen(text);
+  }
+
+  for (; i < num_commands; ++i) {
+    if (!strncmp(commands[i], text, len)) {
+      char *res = strdup(commands[i]);
+      ++i;
+      return res;
+    }
+  }
+
+  // if no command names matched
+  return NULL;
+}
+#endif
