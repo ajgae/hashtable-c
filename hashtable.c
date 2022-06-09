@@ -1,11 +1,16 @@
 #include "hashtable.h"
 
+// Initialize the hashtable. It must then be given some initial
+// capacity using `hashtable_adjust_capacity`. Failing to do so will
+// lead to undefined behaviour.
 void hashtable_init(HashTable *ht) {
   ht->count = 0;
   ht->capacity = 0;
   ht->entries = NULL;
 }
 
+// Free the memory internally allocated by the hashtable functions.
+// This function must be called before freeing the struct itself.
 void hashtable_free(HashTable *ht) {
   if (ht == NULL) return;
   if (ht->entries != NULL) {
@@ -23,7 +28,15 @@ void hashtable_free(HashTable *ht) {
   }
 }
 
+// Adjust the capacity of `ht` to `new_capacity`. Does nothing and
+// returns immediately if `new_capacity` is lower than or equal to the
+// current capacity. This function must be called after
+// `hashtable_init` on a new hashtable struct to actually give it a
+// capacity. Otherwise, the capacity will be 0 and no entries will be
+// allocated.
 void hashtable_adjust_capacity(HashTable *ht, int new_capacity) {
+  if (new_capacity <= ht->capacity) return;
+  
   Entry *new_entries = calloc(sizeof(Entry), new_capacity);
 
   // iterate over old entries; ignore NULL-keyed old entries; find new
@@ -42,7 +55,7 @@ void hashtable_adjust_capacity(HashTable *ht, int new_capacity) {
   ht->capacity = new_capacity;
 }
 
-// Add the `key`-`value` pair to `ht`.
+// Add the given `key`-`value` pair to `ht`.
 bool hashtable_put(HashTable *ht, char *key, char *value) {
   if (hashtable_get_load_factor(ht) >= HT_MAX_LOAD_FACTOR) {
     hashtable_adjust_capacity(ht, ht->capacity * 2);
@@ -72,9 +85,11 @@ bool hashtable_put(HashTable *ht, char *key, char *value) {
 
 // Remove the key-value pair given by `key` in `ht`.
 bool hashtable_remove(HashTable *ht, char *key) {
-  // TODO
+  
 }
 
+// Find the entry with key `key` in an array of `entries` of length
+// `capacity`, using linear probing.
 Entry *find_entry(Entry *entries, int capacity, char *key) {
   uint32_t index = strhash(key) % capacity;
 
@@ -91,16 +106,18 @@ Entry *find_entry(Entry *entries, int capacity, char *key) {
   exit(1);
 }
 
+// Return the load factor of `ht`, that is, count / capacity.
 float hashtable_get_load_factor(HashTable *ht) {
   if (ht->capacity == 0)
     return -1;
   return (float)ht->count / (float)ht->capacity;
 }
 
-uint32_t strhash(char *s) {
+// Return the 32-bit FNV-1a hash of the given `s`tring.
+uint32_t strhash(char *str) {
   uint32_t hash = 2166136261u;
-  for (; *s != '\0'; ++s) {
-    hash ^= (uint8_t)*s;
+  for (; *str != '\0'; ++str) {
+    hash ^= (uint8_t)*str;
     hash *= 16777619;
   }
   return hash;
