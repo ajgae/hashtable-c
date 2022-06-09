@@ -21,7 +21,9 @@ int main(int argc, char **argv) {
 
     char *token = strtok(user_input, INPUT_DELIMITERS);
 
-    if (!strncmp("exit", token, MAX_INPUT_LENGTH)) {
+    if (!strncmp("exit", token, MAX_INPUT_LENGTH) ||
+        !strncmp("quit", token, MAX_INPUT_LENGTH) ||
+        !strncmp("q", token, MAX_INPUT_LENGTH)) {
       printf("Exiting...\n");
       break;
     }
