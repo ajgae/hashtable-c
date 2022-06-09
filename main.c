@@ -47,8 +47,18 @@ int main(int argc, char **argv) {
       for (int i = 0; i < ht.capacity; ++i) {
         Entry entry = ht.entries[i];
         if (entry.key != NULL) {
-          printf("  %s => %s\n", entry.key, entry.value);
+          printf("  %d: %s => %s\n", i, entry.key, entry.value);
         }
+      }
+    }
+
+    else if (!strncmp("hash", token, MAX_INPUT_LENGTH)) {
+      char *str = strtok(NULL, INPUT_DELIMITERS);
+      if (str == NULL) {
+        fprintf(stderr, "Error: string argument required for hash command\n");
+      } else {
+        uint32_t hash = strhash(str);
+        printf("Hash value: 0x%x\n", hash);
       }
     }
 

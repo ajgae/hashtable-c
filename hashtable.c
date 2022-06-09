@@ -77,12 +77,16 @@ bool hashtable_remove(HashTable *ht, char *key) {
 
 Entry *find_entry(Entry *entries, int capacity, char *key) {
   uint32_t index = strhash(key) % capacity;
+
   for (int i = 0; i < capacity; ++i) {
     Entry *entry = &(entries[index]);
-    if (entry->key == key || entry->key == NULL)
+    if (entry->key == NULL || !strncmp(entry->key, key, HT_MAX_KEY_LEN)) {
       return entry;
+    }
     index = (index + 1) % capacity;
   }
+
+  // should never happen
   fprintf(stderr, "Error: could not find entry after iterating over all entries, aborting.");
   exit(1);
 }
