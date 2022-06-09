@@ -10,7 +10,8 @@ This is a simple implementation of a string-to-string hashtable (both keys and v
 
 The user is presented with a simple prompt. A few commands can be issued. Arguments are space-separated, with no support for including space characters in arguments yet.
 
-- `exit`: exit the program.
-- `put`: adds the given key-value pair to the hashtable. Requires two arguments.
-- `show`: display information about the hashtable, such as capacity, load factor, and existing key-value pairs.
-- `hash`: display hash of first argument. If there is a second argument, and it is a valid positive non-zero integer, show hash of first argument modulo second argument.
+- `exit`, `quit` or `q`: exit the program.
+- `put`: add the given key-value pair to the hashtable. Requires two arguments (key and value).
+- `remove`: attempt to remove the entry with the given key from the hashtable. Requires one argument (key).
+- `show`: display information about the hashtable, such as capacity, load factor, and existing key-value pairs. Requires zero arguments.
+- `hash`: display the hash value of the first argument in base 16. If there is a second argument, and it is a valid positive non-zero integer, show hash of first argument modulo second argument, in base 10.
