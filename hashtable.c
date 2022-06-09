@@ -11,6 +11,7 @@ void hashtable_init(HashTable *ht) {
 
 // Free the memory internally allocated by the hashtable functions.
 // This function must be called before freeing the struct itself.
+// Does nothing and returns immediately if `ht == NULL`.
 void hashtable_free(HashTable *ht) {
   if (ht == NULL) return;
   if (ht->entries != NULL) {
@@ -30,12 +31,12 @@ void hashtable_free(HashTable *ht) {
 
 // Adjust the capacity of `ht` to `new_capacity`. Does nothing and
 // returns immediately if `new_capacity` is lower than or equal to the
-// current capacity. This function must be called after
-// `hashtable_init` on a new hashtable struct to actually give it a
-// capacity. Otherwise, the capacity will be 0 and no entries will be
-// allocated.
+// current capacity, or if `ht == NULL`. This function must be called
+// after `hashtable_init` on a new hashtable struct to actually give
+// it a capacity, before calling any other functions on the struct.
+// Otherwise, its capacity is 0 and behaviour is undefined.
 void hashtable_adjust_capacity(HashTable *ht, int new_capacity) {
-  if (new_capacity <= ht->capacity) return;
+  if (ht == NULL || new_capacity <= ht->capacity) return;
   
   Entry *new_entries = calloc(sizeof(Entry), new_capacity);
 
@@ -83,14 +84,34 @@ bool hashtable_put(HashTable *ht, char *key, char *value) {
   return is_new_key;
 }
 
-// Remove the key-value pair given by `key` in `ht`.
+// Remove the key-value pair given by `key` in `ht`. Returns `true` if
+// an entry with such a `key` existed and was removed succesfully, or
+// `false` otherwise or if `ht == NULL || key == NULL`.
 bool hashtable_remove(HashTable *ht, char *key) {
-  
+  if (ht == NULL || key == NULL) {
+    return false;
+  }
+  Entry *entry = find_entry(ht->entries, ht->capacity, key);
+  if (entry->key == NULL) {
+    return false;
+  } else {
+    free(entry->key);
+    entry->key = NULL;
+    free(entry->value);
+    entry->value = NULL;
+    ht->count -= 1;
+    return true;
+  }
 }
 
 // Find the entry with key `key` in an array of `entries` of length
-// `capacity`, using linear probing.
+// `capacity`, using linear probing. Returns `NULL` if either of
+// `entries` or `key` is NULL, or if `capacity <= 0`.
 Entry *find_entry(Entry *entries, int capacity, char *key) {
+  if (entries == NULL || capacity <= 0 || key == NULL) {
+    return NULL;
+  }
+
   uint32_t index = strhash(key) % capacity;
 
   for (int i = 0; i < capacity; ++i) {
@@ -102,14 +123,17 @@ Entry *find_entry(Entry *entries, int capacity, char *key) {
   }
 
   // should never happen
-  fprintf(stderr, "Error: could not find entry after iterating over all entries, aborting.");
+  fprintf(stderr, "Error: could not find entry after iterating over all "
+                  "entries. Aborting.");
   exit(1);
 }
 
 // Return the load factor of `ht`, that is, count / capacity.
 float hashtable_get_load_factor(HashTable *ht) {
-  if (ht->capacity == 0)
-    return -1;
+  // FIXME should a hashtable with 0 capacity be considered full?
+  if (ht->capacity == 0) {
+    return 1;
+  }
   return (float)ht->count / (float)ht->capacity;
 }
 

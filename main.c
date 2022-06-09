@@ -33,10 +33,26 @@ int main(int argc, char **argv) {
       char *value = strtok(NULL, INPUT_DELIMITERS);
       if (key == NULL || value == NULL) {
         fprintf(stderr,
-                "Error: key and value arguments required for puts command\n");
+                "Error: put command requires key and value arguments\n");
       } else {
         printf("Inserting key-value pair: %s => %s\n", key, value);
         hashtable_put(&ht, key, value);
+      }
+    }
+
+    else if (!strncmp("remove", token, MAX_INPUT_LENGTH)) {
+      char *key = strtok(NULL, INPUT_DELIMITERS);
+      if (key == NULL) {
+        fprintf(stderr, "Error: remove command requires key argument\n");
+      } else {
+        bool success = hashtable_remove(&ht, key);
+        if (success) {
+          printf("Successfully removed entry.\n");
+        } else {
+          printf("Could not remove entry. Maybe an entry with key '%s' does "
+                 "not exist?\n",
+                 key);
+        }
       }
     }
 

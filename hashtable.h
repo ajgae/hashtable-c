@@ -26,6 +26,7 @@ typedef struct {
 void hashtable_init(HashTable *ht);
 void hashtable_free(HashTable *ht);
 bool hashtable_put(HashTable *ht, char *key, char *value);
+bool hashtable_remove(HashTable *ht, char* key);
 Entry *find_entry(Entry *entries, int capacity, char *key);
 void hashtable_adjust_capacity(HashTable *ht, int new_capacity);
 float hashtable_get_load_factor(HashTable *ht);
